@@ -1,0 +1,142 @@
+{
+  "name": "enabling_internode_encryption_in_apache_cassandra",
+  "description": "Enabling internode encryption in Apache Cassandra involves configuring the communication between nodes in a Cassandra cluster to be encrypted. This is done to ensure the confidentiality and integrity of data being transmitted between nodes in the cluster. The process of enabling internode encryption can involve updating configuration files, generating and distributing SSL/TLS certificates, and restarting services. This incident type may arise due to a security audit or a compliance requirement that mandates communication between nodes in a Cassandra cluster to be encrypted.",
+  "params": [
+    {
+      "name": "PATH_TO_JAVA",
+      "value": ""
+    },
+    {
+      "name": "PATH_TO_KEYSTORE_FILE",
+      "value": ""
+    },
+    {
+      "name": "VERSION",
+      "value": ""
+    },
+    {
+      "name": "KEYSTORE_PASSWORD",
+      "value": ""
+    },
+    {
+      "name": "PATH_TO_CASSANDRA",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Enabling Internode Encryption in Apache Cassandra\nEnabling internode encryption in Apache Cassandra involves configuring the communication between nodes in a Cassandra cluster to be encrypted. This is done to ensure the confidentiality and integrity of data being transmitted between nodes in the cluster. The process of enabling internode encryption can involve updating configuration files, generating and distributing SSL/TLS certificates, and restarting services. This incident type may arise due to a security audit or a compliance requirement that mandates communication between nodes in a Cassandra cluster to be encrypted."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if Java is installed"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `java -version`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Cassandra version"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `${PATH_TO_CASSANDRA}/bin/nodetool version`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if internode encryption is enabled"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `${PATH_TO_CASSANDRA}/bin/nodetool getsslinfo`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if SSL encryption is enabled in Cassandra configuration"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"server_encryption_options\" ${PATH_TO_CASSANDRA}/conf/cassandra.yaml`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if the keystore file exists and has the correct permissions"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `ls -l ${PATH_TO_KEYSTORE_FILE}`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if the keystore password is correct"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `${PATH_TO_JAVA}/bin/keytool -list -v -keystore ${PATH_TO_KEYSTORE_FILE} -storepass ${KEYSTORE_PASSWORD}`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the Cassandra logs for any errors related to internode encryption"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `tail -f ${PATH_TO_CASSANDRA}/logs/system.log | grep \"internode encryption\"`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Verify that the cluster is running a version of Apache Cassandra that supports internode encryption, and if not, upgrade to a version that does."
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_upgrade_cassandra_version($VERSION)"
+    }
+  ]
+}
